@@ -1,1 +1,145 @@
+CREATE SCHEMA travel_agency;
 
+-- Створення таблиці Countries
+CREATE TABLE travel_agency.Countries (
+    country_id SERIAL PRIMARY KEY,      
+    name VARCHAR(100) NOT NULL    
+);
+
+-- Додавання стовпця до таблиці Countries
+ALTER TABLE travel_agency.Countries
+ADD COLUMN continent VARCHAR(50);
+
+-- Створення таблиці Cities
+CREATE TABLE travel_agency.Cities (
+    city_id SERIAL PRIMARY KEY,    
+    name VARCHAR(100) NOT NULL,
+    country_id INT,
+    FOREIGN KEY (country_id) REFERENCES travel_agency.Countries(country_id)
+);
+
+-- Створення таблиці Users
+CREATE TABLE travel_agency.Users (
+    user_id SERIAL PRIMARY KEY,  
+    first_name VARCHAR(50) NOT NULL,        
+    last_name VARCHAR(50) NOT NULL,          
+    city_id INT,                             
+    email VARCHAR(100) NOT NULL,             
+    phone VARCHAR(20),                       
+    birth_date DATE,                         
+    FOREIGN KEY (city_id) REFERENCES travel_agency.Cities(city_id)  
+);
+
+-- Створення таблиці Agents
+CREATE TABLE travel_agency.Agents (
+    agent_id SERIAL PRIMARY KEY,          
+    user_id INT,
+    commission_percent SMALLINT CHECK (commission_percent >= 1 AND commission_percent <= 99), 
+    hiring_date DATE NOT NULL,            
+    firing_date DATE,
+    FOREIGN KEY (user_id) REFERENCES travel_agency.Users(user_id)                      
+);
+
+-- Створення таблиці Resorts
+CREATE TABLE travel_agency.Resorts (
+    resort_id SERIAL PRIMARY KEY,           
+    city_id INT REFERENCES travel_agency.Cities(city_id),  
+    type VARCHAR(100),                     
+    name VARCHAR(255) NOT NULL,            
+    quality VARCHAR(100),                  
+    location TEXT                          
+);
+
+-- Створення таблиці Photos
+CREATE TABLE travel_agency.Photos (
+    photo_id SERIAL PRIMARY KEY,            
+    resort_id INT REFERENCES travel_agency.Resorts(resort_id),  
+    photo_title VARCHAR(255),               
+    photo_file VARCHAR(255) NOT NULL,      
+    photo_tags TEXT                        
+);
+
+-- Створення таблиці Comments (виправлено орфографічну помилку з 'Coments' на 'Comments')
+CREATE TABLE travel_agency.Comments (
+    comment_id SERIAL PRIMARY KEY,
+    user_id INT,
+    photo_id INT,
+    comment_text TEXT,
+    comment_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES travel_agency.Users(user_id),
+    FOREIGN KEY (photo_id) REFERENCES travel_agency.Photos(photo_id)
+);
+
+-- Створення таблиці Hotels
+CREATE TABLE travel_agency.Hotels (
+    hotel_id SERIAL PRIMARY KEY,
+    resort_id INT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,            
+    phone VARCHAR(20),
+    stars_rating VARCHAR(1) NOT NULL, 
+    FOREIGN KEY (resort_id) REFERENCES travel_agency.Resorts(resort_id)
+);
+
+-- Створення таблиці Room Types
+CREATE TABLE travel_agency.Room_Types (
+    room_type_id SERIAL PRIMARY KEY,
+    room_type_name VARCHAR(255) NOT NULL,
+    hotel_id INT,
+    description TEXT,
+    price_per_day INTEGER CHECK (price_per_day > 0),
+    FOREIGN KEY (hotel_id) REFERENCES travel_agency.Hotels(hotel_id)
+);
+
+-- Створення таблиці Feeding Types
+CREATE TABLE travel_agency.Feeding_Types (
+    feeding_type_id SERIAL PRIMARY KEY,
+    feeding_type_name VARCHAR(255) NOT NULL,
+    feeding_description TEXT 
+);
+
+-- Створення таблиці Hotels Feeding
+CREATE TABLE travel_agency.Hotels_Feeding (
+    hotels_feeding_id SERIAL PRIMARY KEY,
+    hotel_id INT,
+    feeding_type_id INT,
+    price_per_day INTEGER CHECK (price_per_day > 0),
+    FOREIGN KEY (hotel_id) REFERENCES travel_agency.Hotels(hotel_id),
+    FOREIGN KEY (feeding_type_id) REFERENCES travel_agency.Feeding_Types(feeding_type_id)
+);
+
+-- Створення таблиці Inclusives Types
+CREATE TABLE travel_agency.Inclusives_Types (
+    inclusives_type_id SERIAL PRIMARY KEY,
+    inclusives_type_name VARCHAR(255) NOT NULL,
+    resort_id INT,
+    feeding_type_id INT,
+    description TEXT,
+    price_per_day INTEGER CHECK (price_per_day > 0),
+    FOREIGN KEY (resort_id) REFERENCES travel_agency.Resorts(resort_id),
+    FOREIGN KEY (feeding_type_id) REFERENCES travel_agency.Feeding_Types(feeding_type_id)
+);
+
+-- Створення таблиці Contract Details
+CREATE TABLE travel_agency.Contract_Details (
+    contract_details_id SERIAL PRIMARY KEY,
+    room_type_id INT,
+    inclusives_type_id INT,
+    description TEXT,
+    contract_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    rest_period_start DATE NOT NULL,
+    rest_period_end DATE NOT NULL CHECK (rest_period_end > rest_period_start),
+    FOREIGN KEY (room_type_id) REFERENCES travel_agency.Room_Types(room_type_id),
+    FOREIGN KEY (inclusives_type_id) REFERENCES travel_agency.Inclusives_Types(inclusives_type_id)
+);
+
+-- Створення таблиці Contracts
+CREATE TABLE travel_agency.Contracts (
+    contract_id SERIAL PRIMARY KEY,
+    user_id INT,
+    agent_id INT,
+    contract_details_id INT,
+    FOREIGN KEY (user_id) REFERENCES travel_agency.Users(user_id),
+    FOREIGN KEY (contract_details_id) REFERENCES travel_agency.Contract_Details(contract_details_id),
+    FOREIGN KEY (agent_id) REFERENCES travel_agency.Agents(agent_id)
+);
