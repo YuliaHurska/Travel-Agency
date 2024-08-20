@@ -352,3 +352,5 @@ VALUES
 ('Forest Serenity', 16, 1, 'Includes room and breakfast service at Forest Glade Inn.', 11),
 ('Half Board Forest Escape', 16, 2, 'Includes room, breakfast, and one additional meal at Forest Glade Inn.', 26);
 
+
+-- contract and contract_details IN PROGRESS
