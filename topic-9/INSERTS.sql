@@ -353,4 +353,27 @@ VALUES
 ('Half Board Forest Escape', 16, 2, 'Includes room, breakfast, and one additional meal at Forest Glade Inn.', 26);
 
 
--- contract and contract_details IN PROGRESS
+INSERT INTO travel_agency.Contract_Details (room_type_id,inclusives_type_id,contract_date,rest_period_start,rest_period_end) 
+VALUES
+(5,1,'2024-06-02','2024-06-10','2024-06-18'),
+(9,4,'2024-06-10','2024-06-22','2024-06-29'),
+(37,5,'2024-06-10','2024-06-20','2024-06-28'),
+(20,15,'2024-06-11','2024-06-20','2024-06-28'),
+(25,20,'2024-07-01','2024-07-10','2024-07-21'),
+
+(38,28,'2024-07-15','2024-07-20','2024-07-28'),
+(11,12,'2024-08-01','2024-08-09','2024-08-16'),
+(21,19,'2024-08-10','2024-08-15','2024-08-26'),
+(33,23,'2024-08-15','2024-08-20','2024-09-01');
+
+INSERT INTO travel_agency.contracts(user_id ,agent_id,contract_details_id)
+VALUES
+(16,1,1),
+(17,3,2),
+(18,2,3),
+(19,2,4),
+(20,1,5),
+(15,1,6),
+(16,1,7),
+(17,3,8),
+(18,2,9);
